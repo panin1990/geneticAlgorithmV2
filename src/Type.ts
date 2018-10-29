@@ -21,9 +21,17 @@ export class Type {
 
 export class TypesCollection {
   private types: Array<Type> = [];
+  private defaultType: Type;
 
-  public push(type: Type) {
+  public push(type: Type, isDefault: boolean = false) {
     this.types.push(type);
+    if (isDefault) {
+      this.defaultType = type;
+    }
+  }
+
+  public getDefaultType() {
+    return this.defaultType;
   }
 
   public getType(typeName: string) {

@@ -1,7 +1,14 @@
 import {Bot} from "./Bot";
 import {Type, TypesCollection} from "./Type";
+import {PositionInMap} from "./smallClasses";
 
 export class Map {
+
+  private canvasElement: HTMLCanvasElement;
+  private canvasContext: CanvasRenderingContext2D;
+  private gridStep: number;
+  private items: Array<Array<Type>> = [];
+  private typesCollection: TypesCollection;
 
   constructor(canvasElement: HTMLCanvasElement, width: number, height: number, gridStep: number, types: TypesCollection) {
     if ((width % gridStep !== 0) || (height % gridStep !== 0)) {
@@ -16,12 +23,6 @@ export class Map {
     this.fillGrid();
     this.fillEmptyItems();
   }
-
-  private canvasElement: HTMLCanvasElement;
-  private canvasContext: CanvasRenderingContext2D;
-  private gridStep: number;
-  private items: Array<Array<Type>> = [];
-  private typesCollection: TypesCollection;
 
   private fillGrid() {
     for (let i = this.canvasElement.width; i >= 0; i -= this.gridStep) {
@@ -46,12 +47,45 @@ export class Map {
     for (let i = this.canvasElement.width; i >= 0; i -= this.gridStep) {
       this.items[i / this.gridStep] = [];
       for (let j = this.canvasElement.height; j >= 0; j -= this.gridStep) {
-        this.items[i / this.gridStep][j / this.gridStep] = this.typesCollection.getType('empty');
+        this.items[i / this.gridStep][j / this.gridStep] = this.typesCollection.getDefaultType();
       }
     }
   }
 
-  addBotInMap(bot: Bot) {
+  public addBotInMap(bot: Bot) {
+    this.fillCoordinate(bot.getCurrentType(), bot.getPosition());
+    bot.movieBehaviorSubject.subscribe(()=>{
+      if (bot.getPreviousPosition()) {
+        this.moveItem(bot.getPreviousPosition(), bot.getPosition());
+      }
+    });
+  }
 
+  public fillCoordinate(type: Type, positionInMap: PositionInMap) {
+    this.items[positionInMap.x][positionInMap.y] = type;
+  }
+
+  public renderMap() {
+    for (let x = 0; x < this.items.length; x++) {
+      for (let y = 0; y < this.items[x].length; y++) {
+        this.canvasContext.beginPath();
+        this.canvasContext.fillStyle = this.typesCollection.getType(this.items[x][y].typeName).colorInMap;
+        this.canvasContext.fillRect(x * this.gridStep, y * this.gridStep, this.gridStep, this.gridStep);
+        this.canvasContext.stroke();
+      }
+    }
+    this.fillGrid();
+  }
+
+  private moveItem(oldPositionInMap: PositionInMap, newPositionInMap: PositionInMap) {
+    this.clearCanvas();
+    this.items[newPositionInMap.x][newPositionInMap.y] = this.items[oldPositionInMap.x][oldPositionInMap.y];
+    this.items[oldPositionInMap.x][oldPositionInMap.y] = this.typesCollection.getDefaultType();
+    this.renderMap();
+
+  }
+
+  private clearCanvas() {
+    this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
   }
 }
