@@ -5,5 +5,5 @@ https://github.com/panin1990/geneticAlgorithmV2
 
 <pre>
 npm install
-ng build
+npm build
 </pre>
