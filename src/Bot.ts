@@ -8,13 +8,20 @@ export class Bot {
   private previousPosition: PositionInMap;
   private type: Type;
 
-  public health: number = 100;
-  public movieBehaviorSubject: BehaviorSubject<PositionInMap>;
+  private health: number = 100;
+  public behaviorSubject: BehaviorSubject<Boolean>;
 
-  constructor(positionInMap, type: Type) {
+  constructor(positionInMap: PositionInMap, type: Type) {
     this.position = positionInMap;
     this.type = type;
-    this.movieBehaviorSubject = new BehaviorSubject(positionInMap);
+    this.behaviorSubject = new BehaviorSubject(false);
+  }
+
+  public updateHealth(difference: number) {
+    this.health += difference;
+    if (this.health <= 0) {
+      this.behaviorSubject.next(true);
+    }
   }
 
   public getPosition() {
@@ -29,14 +36,16 @@ export class Bot {
     return this.type;
   }
 
-  public go(positionInMap: PositionInMap) {
+  public go(positionInMap: PositionInMap, doEventMove: boolean = true) {
     this.previousPosition = this.position;
     this.position = positionInMap;
-    this.movieBehaviorSubject.next(this.position);
+    if (doEventMove) {
+      this.behaviorSubject.next(false);
+    }
   }
 
   public goBack() {
-    this.go(this.previousPosition);
+    this.go(this.previousPosition, false);
   }
 
 }

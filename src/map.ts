@@ -9,6 +9,7 @@ export class Map {
   private gridStep: number;
   private items: Array<Array<Type>> = [];
   private typesCollection: TypesCollection;
+  private gridColor: string = '#808080';
 
   constructor(canvasElement: HTMLCanvasElement, width: number, height: number, gridStep: number, types: TypesCollection) {
     if ((width % gridStep !== 0) || (height % gridStep !== 0)) {
@@ -27,7 +28,7 @@ export class Map {
   private fillGrid() {
     for (let i = this.canvasElement.width; i >= 0; i -= this.gridStep) {
       this.canvasContext.beginPath();
-      this.canvasContext.strokeStyle = '#808080';
+      this.canvasContext.strokeStyle = this.gridColor;
       this.canvasContext.moveTo(i, 0);
       this.canvasContext.lineTo(i, this.canvasElement.height);
       this.canvasContext.stroke();
@@ -35,7 +36,7 @@ export class Map {
     }
     for (let i = this.canvasElement.height; i >= 0; i -= this.gridStep) {
       this.canvasContext.beginPath();
-      this.canvasContext.strokeStyle = '#808080';
+      this.canvasContext.strokeStyle = this.gridColor;
       this.canvasContext.moveTo(0, i);
       this.canvasContext.lineTo(this.canvasElement.width, i);
       this.canvasContext.stroke();
@@ -52,20 +53,8 @@ export class Map {
     }
   }
 
-  public addBotInMap(bot: Bot) {
-    this.fillCoordinate(bot.getCurrentType(), bot.getPosition());
-    bot.movieBehaviorSubject.subscribe(()=>{
-      if (bot.getPreviousPosition()) {
-        this.moveItem(bot.getPreviousPosition(), bot.getPosition());
-      }
-    });
-  }
-
-  public fillCoordinate(type: Type, positionInMap: PositionInMap) {
-    this.items[positionInMap.x][positionInMap.y] = type;
-  }
-
   public renderMap() {
+
     for (let x = 0; x < this.items.length; x++) {
       for (let y = 0; y < this.items[x].length; y++) {
         this.canvasContext.beginPath();
@@ -75,6 +64,31 @@ export class Map {
       }
     }
     this.fillGrid();
+  }
+
+  public addBotInMap(bot: Bot) {
+    bot.behaviorSubject.subscribe((unsubscribe: Boolean)=>{
+
+      if (unsubscribe) {
+        bot.behaviorSubject.unsubscribe();
+      } else {
+        let newPosition: PositionInMap = bot.getPosition();
+        this.items[bot.getPosition().x][bot.getPosition().y].action(bot);
+
+        if (bot.getPreviousPosition()) {
+          if (newPosition !== bot.getPreviousPosition()) {
+            this.moveItem(bot.getPreviousPosition(), bot.getPosition());
+          }
+        } else {
+          this.addItemInMap(bot.getCurrentType(), bot.getPosition());
+        }
+      }
+
+    });
+  }
+
+  public addItemInMap(type: Type, positionInMap: PositionInMap) {
+    this.items[positionInMap.x][positionInMap.y] = type;
   }
 
   private moveItem(oldPositionInMap: PositionInMap, newPositionInMap: PositionInMap) {

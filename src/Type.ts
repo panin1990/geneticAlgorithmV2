@@ -7,7 +7,7 @@ export class Type {
   public typeName;
   public colorInMap;
 
-  constructor (typeName: string, colorInMap: string, actionToPlayer: (bot: Bot) => void) {
+  constructor (typeName: string, colorInMap: string, actionToPlayer: (bot: Bot) => void = (()=>{})) {
     this.typeName = typeName;
     this.colorInMap = colorInMap;
     this.actionToPlayer = actionToPlayer;
