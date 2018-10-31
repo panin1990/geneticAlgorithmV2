@@ -7,7 +7,6 @@ export class Bot {
   private position: PositionInMap;
   private previousPosition: PositionInMap;
   private type: Type;
-
   private health: number = 100;
   public subject: Subject<Boolean>;
 

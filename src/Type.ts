@@ -2,10 +2,9 @@ import {Bot} from "./Bot";
 
 export class Type {
 
-  private actionToPlayer;
-
-  public typeName;
-  public colorInMap;
+  private actionToPlayer: (bot: Bot) => void;
+  public typeName: string;
+  public colorInMap: string;
 
   constructor (typeName: string, colorInMap: string, actionToPlayer: (bot: Bot) => void = (()=>{})) {
     this.typeName = typeName;
