@@ -1,5 +1,5 @@
 import {PositionInMap} from "./smallClasses";
-import {BehaviorSubject} from "rxjs";
+import {Subject} from "rxjs";
 import {Type} from "./Type";
 
 export class Bot {
@@ -9,18 +9,18 @@ export class Bot {
   private type: Type;
 
   private health: number = 100;
-  public behaviorSubject: BehaviorSubject<Boolean>;
+  public subject: Subject<Boolean>;
 
   constructor(positionInMap: PositionInMap, type: Type) {
     this.position = positionInMap;
     this.type = type;
-    this.behaviorSubject = new BehaviorSubject(false);
+    this.subject = new Subject();
   }
 
   public updateHealth(difference: number) {
     this.health += difference;
     if (this.health <= 0) {
-      this.behaviorSubject.next(true);
+      this.subject.next(true);
     }
   }
 
@@ -40,7 +40,7 @@ export class Bot {
     this.previousPosition = this.position;
     this.position = positionInMap;
     if (doEventMove) {
-      this.behaviorSubject.next(false);
+      this.subject.next(false);
     }
   }
 

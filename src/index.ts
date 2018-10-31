@@ -14,13 +14,13 @@ typesCollection.push(emptyType, true);
 typesCollection.push(botType);
 
 let firstTestBot = new Bot(new PositionInMap(0,0), botType);
-// let secondTestBot = new Bot(new PositionInMap(10,15), botType);
+let secondTestBot = new Bot(new PositionInMap(5,13), botType);
 
 let map = new Map(<HTMLCanvasElement> document.getElementById('canvasMap'), 1500, 400, 20, typesCollection);
 map.addBotInMap(firstTestBot);
 map.addItemInMap(poisonType, new PositionInMap(10,15));
-// map.addBotInMap(secondTestBot);
+map.addBotInMap(secondTestBot);
 map.renderMap();
 console.log(map);
 
-setTimeout(()=>{firstTestBot.go(new PositionInMap(10,15))}, 1000);
+setTimeout(()=>{firstTestBot.go(new PositionInMap(5,13))}, 1000);

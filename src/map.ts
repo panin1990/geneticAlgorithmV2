@@ -67,23 +67,18 @@ export class Map {
   }
 
   public addBotInMap(bot: Bot) {
-    bot.behaviorSubject.subscribe((unsubscribe: Boolean)=>{
-
+    this.addItemInMap(bot.getCurrentType(), bot.getPosition());
+    bot.subject.subscribe((unsubscribe: Boolean)=>{
       if (unsubscribe) {
-        bot.behaviorSubject.unsubscribe();
+        bot.subject.unsubscribe();
       } else {
         let newPosition: PositionInMap = bot.getPosition();
         this.items[bot.getPosition().x][bot.getPosition().y].action(bot);
 
-        if (bot.getPreviousPosition()) {
-          if (newPosition !== bot.getPreviousPosition()) {
-            this.moveItem(bot.getPreviousPosition(), bot.getPosition());
-          }
-        } else {
-          this.addItemInMap(bot.getCurrentType(), bot.getPosition());
+        if (newPosition !== bot.getPreviousPosition()) {
+          this.moveItem(bot.getPreviousPosition(), bot.getPosition());
         }
       }
-
     });
   }
 
