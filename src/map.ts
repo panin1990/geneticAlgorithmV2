@@ -54,7 +54,7 @@ export class Map {
   }
 
   public getAroundItems(position: PositionInMap,viewingRange: number) {
-    let itemsAround = [];;
+    let itemsAround = [];
     for (let x = (position.x - viewingRange); x <= (position.x + viewingRange); x++) {
       if (this.items[x]) {
         itemsAround[x] = [];
