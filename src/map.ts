@@ -53,6 +53,21 @@ export class Map {
     }
   }
 
+  public getAroundItems(position: PositionInMap,viewingRange: number) {
+    let itemsAround = [];;
+    for (let x = (position.x - viewingRange); x <= (position.x + viewingRange); x++) {
+      if (this.items[x]) {
+        itemsAround[x] = [];
+        for (let y = (position.y - viewingRange); y <= (position.y + viewingRange); y++) {
+          if (this.items[x][y]) {
+            itemsAround[x][y] = this.items[x][y]
+          }
+        }
+      }
+    }
+    return itemsAround;
+  }
+
   public renderMap() {
 
     for (let x = 0; x < this.items.length; x++) {
