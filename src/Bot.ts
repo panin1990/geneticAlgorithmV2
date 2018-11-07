@@ -2,6 +2,7 @@ import {PositionInMap} from "./smallClasses";
 import {Subject} from "rxjs";
 import {Type} from "./Type";
 import {isNumeric} from "rxjs/internal/util/isNumeric";
+import {Genome} from "./Genome";
 
 export class Bot {
 
@@ -10,18 +11,50 @@ export class Bot {
   private type: Type;
   private health: number = 100;
   private mapWeights: Array<Array<number>>;
-  public viewingRange: number = 1;
+  private genome: Genome;
+
   public subject: Subject<Boolean>;
 
-  constructor(positionInMap: PositionInMap, type: Type) {
+  constructor(positionInMap: PositionInMap, type: Type, genome: Genome) {
     this.position = positionInMap;
     this.type = type;
+    this.genome = genome;
     this.subject = new Subject();
     this.mapWeights = [];
   }
 
-  public fillMapWeights(itemsAround: Array<Array<PositionInMap>>) {
-    console.log(itemsAround);
+  public fillMapWeights(itemsAround: Array<Array<Type>>) {
+    this.foreachItems(itemsAround, (masterX, masterY, item)=>{
+      if (!this.mapWeights[masterX]) {
+        this.mapWeights[masterX] = [];
+      }
+      this.mapWeights[masterX][masterY] = (
+        Math.abs(this.position.x - masterX) > Math.abs(this.position.y - masterY) ?
+          this.genome.action[item.typeName][Math.abs(this.position.x - masterX)] :
+          this.genome.action[item.typeName][Math.abs(this.position.y - masterY)]
+      );
+
+      this.foreachItems(itemsAround, (slaveX, slaveY, slaveItem)=>{
+        this.mapWeights[masterX][masterY] += (
+          Math.abs(masterX - slaveX) > Math.abs(masterY - slaveY) ?
+            this.genome.action[slaveItem.typeName][Math.abs(masterX - slaveX)] :
+            this.genome.action[slaveItem.typeName][Math.abs(masterY - slaveY)]
+        );
+      });
+    });
+    return this.mapWeights;
+  }
+
+  private foreachItems(items: Array<Array<Type>>, func: (x: number, y: number, item: Type) => void) {
+    for (let x = 0; x <= items.length; x++) {
+      if (items[x]) {
+        for (let y = 0; y <= items[x].length; y++) {
+          if (items[x][y]) {
+            func(x, y, items[x][y]);
+          }
+        }
+      }
+    }
   }
 
   public goOptimalPath() {
