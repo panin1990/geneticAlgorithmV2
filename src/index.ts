@@ -19,12 +19,12 @@ typesCollection.push(botType);
 let map = new Map(<HTMLCanvasElement> document.getElementById('canvasMap'), 1500, 400, 20, typesCollection);
 
 map.addItemInMap(poisonType, new PositionInMap(10,15));
-map.addItemInMap(eatType, new PositionInMap(6,15));
+map.addItemInMap(eatType, new PositionInMap(6,14));
 
 let exampleGenome = new Genome;
 exampleGenome.action = {
   bot: [0, 0, 0, 0, 0, 0, 0, 0],
-  eat: [900, 800, 700, 600, 500, 400, 300],
+  eat: [3000, 1500, 700, 600, 500, 400, 300],
   poison: [-100, 0, 0, 0, 0, 0, 0, 0],
   empty: [-9, -8, -7, -6, -5, -4, -3, -2]
 };
