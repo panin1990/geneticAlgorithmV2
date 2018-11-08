@@ -29,18 +29,14 @@ export class Bot {
         this.mapWeights[masterX] = [];
       }
 
-      this.mapWeights[masterX][masterY] = this.genome.action[item.typeName][0];
+      this.mapWeights[masterX][masterY] = 0;
 
       this.foreachItems(itemsAround, (slaveX, slaveY, slaveItem)=>{
-
-        if (!(slaveX === masterX && slaveY === masterY)) {
-
-          this.mapWeights[masterX][masterY] += (
-            Math.abs(masterX - slaveX) > Math.abs(masterY - slaveY) ?
-              this.genome.action[slaveItem.typeName][Math.abs(masterX - slaveX)] :
-              this.genome.action[slaveItem.typeName][Math.abs(masterY - slaveY)]
-          );
-        }
+        this.mapWeights[masterX][masterY] += (
+          Math.abs(masterX - slaveX) > Math.abs(masterY - slaveY) ?
+            this.genome.action[slaveItem.typeName][Math.abs(masterX - slaveX)] :
+            this.genome.action[slaveItem.typeName][Math.abs(masterY - slaveY)]
+        );
       });
     });
     return this.mapWeights;
