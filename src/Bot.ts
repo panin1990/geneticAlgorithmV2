@@ -12,6 +12,9 @@ export class Bot {
   private health: number = 100;
   private mapWeights: Array<Array<number>>;
   private genome: Genome;
+  private memory: Array<Array<MemoryItem>> = [];
+  private time: number = 0;
+  private memorySize: number;
 
   public subject: Subject<Boolean>;
 
@@ -24,7 +27,22 @@ export class Bot {
   }
 
   public fillMapWeights(itemsAround: Array<Array<Type>>) {
-    this.foreachItems(itemsAround, (masterX, masterY, item)=>{
+    let oneStepDistanceItems = [];
+    for (let positionAroundX = (this.getPosition().x - 1); positionAroundX <= (this.getPosition().x + 1); positionAroundX++) {
+      if (itemsAround[positionAroundX]) {
+        oneStepDistanceItems[positionAroundX] = [];
+        for (let positionAroundY = (this.getPosition().y - 1); positionAroundY <= (this.getPosition().y + 1); positionAroundY++) {
+          if (
+            itemsAround[positionAroundX][positionAroundY] &&
+            !((positionAroundX === this.getPosition().x) && (positionAroundY === this.getPosition().y))
+          ) {
+            oneStepDistanceItems[positionAroundX][positionAroundY] = itemsAround[positionAroundX][positionAroundY];
+          }
+        }
+      }
+    }
+
+    this.foreachItems(oneStepDistanceItems, (masterX, masterY, item)=>{
       if (!this.mapWeights[masterX]) {
         this.mapWeights[masterX] = [];
       }
@@ -38,6 +56,17 @@ export class Bot {
             this.genome.action[slaveItem.typeName][Math.abs(masterY - slaveY)]
         );
       });
+
+      //memory injection
+
+
+
+      //fill memory
+      if (!this.memory[masterX]) {
+        this.memory[masterX] = [];
+      }
+      this.memory[masterX][masterY] = {memoryTimeStamp: this.time, item: item};
+
     });
     return this.mapWeights;
   }
@@ -108,4 +137,9 @@ export class Bot {
     this.go(this.previousPosition, false);
   }
 
+}
+
+export class MemoryItem {
+  public memoryTimeStamp: number;
+  public item: Type;
 }

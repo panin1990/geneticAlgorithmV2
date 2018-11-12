@@ -28,7 +28,6 @@ exampleGenome.action = {
   poison: [-1000, -800, 0, 0, 0, 0, 0, 0],
   empty: [-9, -8, -7, -6, -5, -4, -3, -2]
 };
-console.log(exampleGenome);
 
 
 let firstTestBot = new Bot(new PositionInMap(0,0), botType, exampleGenome);
