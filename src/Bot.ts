@@ -58,14 +58,21 @@ export class Bot {
       });
 
       //memory injection
-
-
+      this.foreachItems(this.memory, (memoryX, memoryY, memoryItem)=>{
+        if (!itemsAround[memoryX] || !itemsAround[memoryX][memoryY]) {
+          this.mapWeights[masterX][masterY] += (
+            Math.abs(masterX - memoryX) > Math.abs(masterY - memoryY) ?
+              this.genome.action[memoryItem.typeName][Math.abs(masterX - memoryX)] :
+              this.genome.action[memoryItem.typeName][Math.abs(masterY - masterY)]
+          );
+        }
+      });
 
       //fill memory
       if (!this.memory[masterX]) {
         this.memory[masterX] = [];
       }
-      this.memory[masterX][masterY] = {memoryTimeStamp: this.time, item: item};
+      this.memory[masterX][masterY] = new MemoryItem(item, this.time);
 
     });
     return this.mapWeights;
@@ -139,7 +146,11 @@ export class Bot {
 
 }
 
-export class MemoryItem {
+export class MemoryItem extends Type {
   public memoryTimeStamp: number;
-  public item: Type;
+
+  constructor (type: Type, memoryTimeStamp: number = 0) {
+    super(type.typeName,type.colorInMap, type.action);
+    this.memoryTimeStamp = memoryTimeStamp;
+  }
 }
