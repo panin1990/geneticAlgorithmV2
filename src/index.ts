@@ -1,7 +1,7 @@
-import {Map} from "./map";
+import {Map} from "./Map";
 import {Bot} from "./Bot";
 import {Type, TypesCollection} from "./Type";
-import {PositionInMap} from "./smallClasses";
+import {PositionInMap, Tools} from "./smallClasses";
 import {Genome} from "./Genome";
 
 
@@ -18,8 +18,7 @@ typesCollection.push(botType);
 
 let map = new Map(<HTMLCanvasElement> document.getElementById('canvasMap'), 1500, 400, 20, typesCollection);
 
-map.addItemInMap(poisonType, new PositionInMap(4,12));
-map.addItemInMap(eatType, new PositionInMap(6,14));
+let botsViewRange = 2;
 
 let exampleGenome = new Genome;
 exampleGenome.action = {
@@ -29,18 +28,53 @@ exampleGenome.action = {
   empty: [-9, -8, -7, -6, -5, -4, -3, -2]
 };
 
-
-let firstTestBot = new Bot(new PositionInMap(0,0), botType, exampleGenome);
 let secondTestBot = new Bot(new PositionInMap(5,13), botType, exampleGenome);
-map.addBotInMap(firstTestBot);
 map.addBotInMap(secondTestBot);
 
 
 map.renderMap();
 
-setTimeout(()=>{
-  console.log(secondTestBot.getPosition());
-  console.log(secondTestBot.fillMapWeights(map.getAroundItems(secondTestBot.getPosition(), 2)));
-  // secondTestBot.fillMapWeights(map.getAroundItems(secondTestBot.getPosition(), secondTestBot.viewingRange));
-  secondTestBot.goOptimalPath();
-}, 1000);
+//fill items map
+function fillMap(map: Map, items:Array<TypesToFill>):Array<Bot> {
+  let bots = [];
+  for (let i = 0; i < items.length; i++) {
+    for(let j = 0; j < items[i].count; j++) {
+      let emptyRandomCoordinate: PositionInMap;
+      while (!emptyRandomCoordinate) {
+        let position = new PositionInMap(Tools.randomInt(0, map.getParams().width - 1), Tools.randomInt(0, map.getParams().height - 1));
+        if (map.isEmpty(position)) {
+          emptyRandomCoordinate = position;
+        }
+      }
+      if (items[i].type !== 'bot') {
+        map.addItemInMap(map.typesCollection.getType(items[i].type), emptyRandomCoordinate);
+      } else {
+        let bot = new Bot(emptyRandomCoordinate, botType, exampleGenome);
+        map.addBotInMap(bot);
+        bots.push(bot);
+      }
+    }
+  }
+  return bots;
+}
+
+let bots = fillMap(map, [{type: 'eat', count: 40},{type: 'poison', count: 30}, {type: 'bot', count: 1}]);
+console.log(bots);
+// bots[0].fillMapWeights(map.getAroundItems(secondTestBot.getPosition(), botsViewRange));
+// bots[0].goOptimalPath();
+setInterval(()=>{
+  console.log(bots[0].getPosition());
+  bots[0].fillMapWeights(map.getAroundItems(bots[0].getPosition(), botsViewRange));
+  bots[0].goOptimalPath();
+}, 1500);
+
+// setTimeout(()=>{
+//   secondTestBot.fillMapWeights(map.getAroundItems(secondTestBot.getPosition(), botsViewRange));
+//   secondTestBot.goOptimalPath();
+// }, 1000);
+
+
+class TypesToFill {
+  public type: string;
+  public count: number;
+}
